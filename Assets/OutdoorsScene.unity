@@ -904,7 +904,8 @@ Transform:
   m_LocalPosition: {x: -0.017466798, y: 0.0007098797, z: -0.04689286}
   m_LocalScale: {x: 0.02875328, y: 0.02875328, z: 0.02875328}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 7423945430389992085}
   m_Father: {fileID: 4928268367890858174}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1333608566
@@ -1846,7 +1847,6 @@ Transform:
   - {fileID: 189526044}
   - {fileID: 933289320}
   - {fileID: 1307781376}
-  - {fileID: 7423945430389992085}
   - {fileID: 1225267995}
   m_Father: {fileID: 5495279385984375596}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1924,9 +1924,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlightController
   throttleIncrement: 0.1
-  maxThrust: 3000
+  maxThrust: 1800
   responsiveness: 6.7
-  lift: 1
+  lift: 30
   engineSpoolTime: 9
   dragCoefficient: 0.5
   leftAileron: {fileID: 228474333}
@@ -2148,12 +2148,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2830171789571642102}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0.000000021855694, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.6074715, y: -0.02468872, z: 1.6308594}
+  m_LocalScale: {x: 34.77864, y: 34.77864, z: 34.77864}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4928268367890858174}
+  m_Father: {fileID: 1307781376}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7470729800894612575
 GameObject:

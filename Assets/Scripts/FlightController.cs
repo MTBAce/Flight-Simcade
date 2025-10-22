@@ -111,14 +111,14 @@ public class FlightController : MonoBehaviour
         if (leftElevator != null)
         {
             float targetAngle = pitch * maxElevatorAngle;
-            Quaternion targetRotation = Quaternion.Euler(targetAngle, 0, 0);
+            Quaternion targetRotation = Quaternion.Euler(-targetAngle, 0, 0);
             leftElevator.localRotation = Quaternion.Lerp(leftElevator.localRotation, targetRotation, deltaTime);
         }
         
         if (rightElevator != null)
         {
             float targetAngle = pitch * maxElevatorAngle;
-            Quaternion targetRotation = Quaternion.Euler(targetAngle, 0, 0);
+            Quaternion targetRotation = Quaternion.Euler(-targetAngle, 0, 0);
             rightElevator.localRotation = Quaternion.Lerp(rightElevator.localRotation, targetRotation, deltaTime);
         }
         
