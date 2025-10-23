@@ -580,10 +580,10 @@ MonoBehaviour:
     m_Value: 1
   shadows:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0
   shadowResolution:
     m_OverrideState: 1
-    m_Value: 256
+    m_Value: 1024
   shadowDistance:
     m_OverrideState: 0
     m_Value: 8000
