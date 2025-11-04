@@ -44,10 +44,12 @@ public class FlightController : MonoBehaviour
     
     Rigidbody rb;
     [SerializeField] private TextMeshProUGUI hud;
+    private MissileSystem missileSystem;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        missileSystem = GetComponent<MissileSystem>();
     }
 
     private void HandleInput()
@@ -157,9 +159,46 @@ public class FlightController : MonoBehaviour
 
     private void UpdateHUD()
     {
-        hud.text = "Throttle: " + throttle.ToString("F0") + "%\n";
+        hud.text = "=== F-16 FLIGHT DATA ===\n";
+        hud.text += "Throttle: " + throttle.ToString("F0") + "%\n";
         hud.text += "Engine Power: " + currentThrust.ToString("F0") + "%\n";
         hud.text += "Altitude: " + transform.position.y.ToString("F0") + " m\n";
         hud.text += "Airspeed: " + (rb.linearVelocity.magnitude * 3.6f).ToString("F0") + " km/h\n";
+        
+        // Add missile system info
+        if (missileSystem != null)
+        {
+            hud.text += "\n=== WEAPONS ===\n";
+            hud.text += "Missiles: " + missileSystem.GetMissileCount() + "\n";
+            hud.text += "Type: " + missileSystem.GetCurrentMissileType().ToString() + "\n";
+            hud.text += "\n" + missileSystem.GetTargetingInfo() + "\n";
+            
+            // Display lock indicator
+            if (missileSystem.HasTarget())
+            {
+                float lockProgress = missileSystem.GetLockProgress();
+                string lockBar = "[";
+                int barLength = 20;
+                int filled = (int)(lockProgress * barLength);
+                
+                for (int i = 0; i < barLength; i++)
+                {
+                    lockBar += i < filled ? "=" : "-";
+                }
+                lockBar += "]";
+                
+                hud.text += lockBar + " " + (lockProgress * 100f).ToString("F0") + "%\n";
+                
+                if (missileSystem.IsTargetLocked())
+                {
+                    hud.text += "<color=red>*** TARGET LOCKED ***</color>\n";
+                }
+            }
+            
+            hud.text += "\n=== CONTROLS ===\n";
+            hud.text += "F/Mouse: Fire Missile\n";
+            hud.text += "T: Cycle Target\n";
+            hud.text += "N: Change Missile Type\n";
+        }
     }
 }
