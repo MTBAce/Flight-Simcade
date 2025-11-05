@@ -21,7 +21,6 @@ public class Missile : MonoBehaviour
     public ParticleSystem smokeTrail;
     public Light missileLight;
     public float explosionRadius = 20f;
-    public float explosionDamage = 100f;
     
     [Header("Audio")]
     public AudioClip launchSound;
@@ -239,26 +238,16 @@ public class Missile : MonoBehaviour
             // Calculate damage based on distance
             float distance = Vector3.Distance(transform.position, hitCollider.transform.position);
             float damageFalloff = 1f - (distance / explosionRadius);
-            float damage = explosionDamage * damageFalloff;
             
             // Try to apply damage (if target has health component)
             // You can implement your own health system here
             if (hitTarget && hitCollider.transform == target)
             {
-                Debug.Log($"Missile direct hit on {target.name}! Damage: {damage}");
+                Debug.Log($"Missile direct hit on {target.name}! Target Destroyed");
+                Destroy(target.gameObject);
             }
-            else if (damage > 10f) // Minimum damage threshold
-            {
-                Debug.Log($"Missile splash damage to {hitCollider.name}: {damage}");
-            }
-            
-            // Apply physics force
-            Rigidbody targetRb = hitCollider.GetComponent<Rigidbody>();
-            if (targetRb != null)
-            {
-                Vector3 explosionDirection = (hitCollider.transform.position - transform.position).normalized;
-                targetRb.AddForce(explosionDirection * damage * 10f, ForceMode.Impulse);
-            }
+          
+          
         }
         
         Destroy(gameObject);

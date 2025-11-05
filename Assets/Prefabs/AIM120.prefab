@@ -135,7 +135,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -154,12 +154,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Missile
   missileType: 1
-  maxSpeed: 300
+  maxSpeed: 2000
   acceleration: 50
   turnRate: 3
-  maxLifetime: 30
+  maxLifetime: 120
   proximityDetonation: 5
-  fuelDuration: 15
+  fuelDuration: 30
   lockStrength: 1
   guidanceDelay: 0.5
   maxTurnAngle: 180
@@ -167,7 +167,6 @@ MonoBehaviour:
   smokeTrail: {fileID: 0}
   missileLight: {fileID: 0}
   explosionRadius: 20
-  explosionDamage: 100
   launchSound: {fileID: 0}
   flyingSound: {fileID: 0}
   explosionSound: {fileID: 0}
