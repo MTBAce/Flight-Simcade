@@ -26,13 +26,6 @@ public class MissileSystem : MonoBehaviour
     public AudioClip noLockSound;
     public AudioClip lockBreakSound;
     
-    [Header("Visual Feedback")]
-    public GameObject lockingIndicatorPrefab; // Optional UI element
-    public Color lockingColor = Color.yellow;
-    public Color lockedColor = Color.red;
-    public Canvas targetCanvas; // Assign your UI Canvas here
-    public float indicatorScale = 1f;
-    
     private int currentMissileCount;
     private Transform currentTarget;
     private float lockTimer;
@@ -45,8 +38,6 @@ public class MissileSystem : MonoBehaviour
     private FlightController flightController;
     private float lockingSoundTimer;
     private MissileType currentMissileType;
-    private GameObject currentIndicator;
-    private Camera mainCamera;
     
     private void Awake()
     {
@@ -55,13 +46,6 @@ public class MissileSystem : MonoBehaviour
         audioSource = gameObject.AddComponent<AudioSource>();
         audioSource.spatialBlend = 0f; // 2D sound for cockpit
         flightController = GetComponent<FlightController>();
-        mainCamera = Camera.main;
-        
-        // Auto-find canvas if not assigned
-        if (targetCanvas == null)
-        {
-            targetCanvas = FindFirstObjectByType<Canvas>();
-        }
     }
     
     private void Update()
@@ -70,34 +54,13 @@ public class MissileSystem : MonoBehaviour
         HandleMissileFiring();
         HandleTargetCycling();
         HandleMissileTypeSelection();
-        UpdateLockingIndicator();
-    }
-    
-    private void OnDestroy()
-    {
-        // Clean up indicator when destroyed
-        if (currentIndicator != null)
-        {
-            Destroy(currentIndicator);
-        }
     }
     
     private void UpdateTargeting()
     {
-        // Refresh available targets list
-        availableTargets.Clear();
-        Collider[] potentialTargets = Physics.OverlapSphere(transform.position, maxLockRange, targetLayer);
-        
-        foreach (Collider col in potentialTargets)
-        {
-            Vector3 directionToTarget = col.transform.position - transform.position;
-            float angle = Vector3.Angle(transform.forward, directionToTarget);
-            
-            if (angle < lockAngle)
-            {
-                availableTargets.Add(col.transform);
-            }
-        }
+        // Find potential targets in front of aircraft
+        UpdateAvailableTargets();
+        Transform bestTarget = FindBestTarget();
         
         // Auto-acquire target if none selected
         if (currentTarget == null && availableTargets.Count > 0)
@@ -107,7 +70,6 @@ public class MissileSystem : MonoBehaviour
             lockTimer = 0f;
             isLocking = true;
             isLocked = false;
-            CreateLockingIndicator();
         }
         
         // Check if current target is still valid
@@ -120,25 +82,20 @@ public class MissileSystem : MonoBehaviour
             // Break lock if target outside parameters
             if (angle > lockBreakAngle || distance > maxLockRange || !availableTargets.Contains(currentTarget))
             {
-                if (isLocked || isLocking)
-                {
-                    PlaySound(lockBreakSound);
-                    Debug.Log("Lock broken!");
-                }
-                DestroyLockingIndicator();
+                // Lost target
+                PlaySound(lockBreakSound);
+                Debug.Log($"Lock broken on {currentTarget.name}");
                 currentTarget = null;
                 lockTimer = 0f;
                 isLocking = false;
                 isLocked = false;
-                return;
             }
-            
-            // Continue locking
-            if (!isLocked)
+            else
             {
+                // Continue locking on current target
                 lockTimer += Time.deltaTime;
                 
-                if (lockTimer >= lockOnTime)
+                if (lockTimer >= lockOnTime && isLocking)
                 {
                     // Full lock achieved
                     isLocking = false;
@@ -148,152 +105,53 @@ public class MissileSystem : MonoBehaviour
                 }
                 else if (isLocking)
                 {
-                    // Still locking - play periodic tone
+                    // Still locking
                     PlayLockingSound();
                 }
             }
         }
-        else
-        {
-            lockTimer = 0f;
-            isLocking = false;
-            isLocked = false;
-            DestroyLockingIndicator();
-        }
     }
-    
-    private void CreateLockingIndicator()
+
+    private void UpdateAvailableTargets()
     {
-        if (lockingIndicatorPrefab == null || targetCanvas == null)
-            return;
-            
-        // Destroy existing indicator if any
-        DestroyLockingIndicator();
+        availableTargets.Clear();
         
-        // Create new indicator as child of canvas
-        currentIndicator = Instantiate(lockingIndicatorPrefab, targetCanvas.transform);
+        Collider[] potentialTargets = Physics.OverlapSphere(
+            transform.position,
+            maxLockRange,
+            targetLayer
+        );
         
-        // Set initial scale
-        currentIndicator.transform.localScale = Vector3.one * indicatorScale;
-        
-        // Set initial color to locking color
-        UpdateIndicatorColor(lockingColor);
-    }
-    
-    private void DestroyLockingIndicator()
-    {
-        if (currentIndicator != null)
+        foreach (Collider col in potentialTargets)
         {
-            Destroy(currentIndicator);
-            currentIndicator = null;
-        }
-    }
-    
-    private void UpdateLockingIndicator()
-    {
-        if (currentIndicator == null || currentTarget == null || mainCamera == null)
-            return;
-        
-        // Convert target world position to screen space
-        Vector3 screenPos = mainCamera.WorldToScreenPoint(currentTarget.position);
-        
-        // Check if target is in front of camera
-        if (screenPos.z > 0)
-        {
-            // Get RectTransform for proper UI positioning
-            RectTransform rectTransform = currentIndicator.GetComponent<RectTransform>();
-            if (rectTransform != null)
+            if (col.transform != transform) // Don't target self
             {
-                // For Screen Space - Overlay, directly use screen position
-                if (targetCanvas.renderMode == RenderMode.ScreenSpaceOverlay)
-                {
-                    rectTransform.position = screenPos;
-                }
-                // For Screen Space - Camera, convert to local canvas position
-                else if (targetCanvas.renderMode == RenderMode.ScreenSpaceCamera)
-                {
-                    Vector2 localPoint;
-                    RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                        targetCanvas.GetComponent<RectTransform>(),
-                        screenPos,
-                        targetCanvas.worldCamera,
-                        out localPoint
-                    );
-                    rectTransform.localPosition = localPoint;
-                }
+                availableTargets.Add(col.transform);
             }
-            else
-            {
-                // Fallback if no RectTransform (shouldn't happen)
-                currentIndicator.transform.position = screenPos;
-            }
-            
-            // Update color based on lock status
-            if (isLocked)
-            {
-                UpdateIndicatorColor(lockedColor);
-            }
-            else if (isLocking)
-            {
-                // Lerp between locking and locked color based on progress
-                Color currentColor = Color.Lerp(lockingColor, lockedColor, GetLockProgress());
-                UpdateIndicatorColor(currentColor);
-            }
-            
-            // Optional: Add pulsing effect while locking
-            if (isLocking && !isLocked)
-            {
-                float pulse = 1f + Mathf.Sin(Time.time * 10f) * 0.1f;
-                currentIndicator.transform.localScale = Vector3.one * indicatorScale * pulse;
-            }
-            else
-            {
-                currentIndicator.transform.localScale = Vector3.one * indicatorScale;
-            }
-            
-            // Show indicator
-            currentIndicator.SetActive(true);
-        }
-        else
-        {
-            // Hide indicator if target is behind camera
-            currentIndicator.SetActive(false);
-        }
-    }
-    
-    private void UpdateIndicatorColor(Color color)
-    {
-        if (currentIndicator == null)
-            return;
-        
-        // Try to find Image component
-        UnityEngine.UI.Image image = currentIndicator.GetComponentInChildren<UnityEngine.UI.Image>();
-        if (image != null)
-        {
-            image.color = color;
-        }
-        
-        // Also try to update any other UI components that might have color
-        UnityEngine.UI.RawImage rawImage = currentIndicator.GetComponentInChildren<UnityEngine.UI.RawImage>();
-        if (rawImage != null)
-        {
-            rawImage.color = color;
         }
     }
     
     private Transform FindBestTarget()
     {
-        if (availableTargets.Count == 0)
-            return null;
+        Collider[] potentialTargets = Physics.OverlapSphere(
+            transform.position, 
+            maxLockRange, 
+            targetLayer
+        );
         
         Transform bestTarget = null;
         float bestScore = float.MaxValue;
         
-        foreach (Transform target in availableTargets)
+        foreach (Collider col in potentialTargets)
         {
-            Vector3 directionToTarget = target.position - transform.position;
+            if (col.transform == transform) continue; // Skip self
+            
+            Vector3 directionToTarget = col.transform.position - transform.position;
             float angle = Vector3.Angle(transform.forward, directionToTarget);
             float distance = directionToTarget.magnitude;
+            
+            // Only consider targets within lock angle
+            if (angle > lockAngle) continue;
             
             // Score based on angle and distance (prefer close and centered)
             float score = angle * 10f + distance * 0.1f;
@@ -301,7 +159,7 @@ public class MissileSystem : MonoBehaviour
             if (score < bestScore)
             {
                 bestScore = score;
-                bestTarget = target;
+                bestTarget = col.transform;
             }
         }
         
@@ -317,7 +175,6 @@ public class MissileSystem : MonoBehaviour
             lockTimer = 0f;
             isLocking = true;
             isLocked = false;
-            CreateLockingIndicator();
             Debug.Log($"Cycling to target: {currentTarget.name}");
         }
     }
@@ -338,7 +195,8 @@ public class MissileSystem : MonoBehaviour
     
     private void HandleMissileFiring()
     {
-        if (Input.GetKeyDown(fireMissileKey) || Input.GetKeyDown(KeyCode.Mouse0))
+        // Fire missile with a key (e.g., left mouse button or a specific key)
+        if (Input.GetKeyDown(KeyCode.Mouse0) || Input.GetKeyDown(KeyCode.F))
         {
             if (currentMissileCount <= 0)
             {
@@ -367,11 +225,7 @@ public class MissileSystem : MonoBehaviour
     
     private void LaunchMissile()
     {
-        if (missileHardpoints.Length == 0)
-        {
-            Debug.LogWarning("No missile hardpoints configured!");
-            return;
-        }
+        if (missileHardpoints.Length == 0) return;
         
         // Get next available hardpoint
         Transform launchPoint = missileHardpoints[nextHardpointIndex % missileHardpoints.Length];
@@ -393,13 +247,10 @@ public class MissileSystem : MonoBehaviour
         
         // Get aircraft velocity for proper launch
         Vector3 aircraftVelocity = Vector3.zero;
-        if (flightController != null)
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
         {
-            Rigidbody rb = GetComponent<Rigidbody>();
-            if (rb != null)
-            {
-                aircraftVelocity = rb.linearVelocity;
-            }
+            aircraftVelocity = rb.linearVelocity;
         }
         
         float lockQuality = Mathf.Clamp01(lockTimer / lockOnTime);
@@ -408,10 +259,12 @@ public class MissileSystem : MonoBehaviour
         currentMissileCount--;
         PlaySound(launchSound);
         
-        Debug.Log($"Missile launched! Remaining: {currentMissileCount}, Type: {currentMissileType}, Lock Quality: {lockQuality * 100f:F0}%");
+        // Reset lock after firing
+        lockTimer = 0f;
+        isLocking = false;
+        isLocked = false;
         
-        // Keep lock for potential follow-up shots
-        // Reset lock after a short delay or after target is destroyed
+        Debug.Log($"Missile launched! Remaining: {currentMissileCount}");
     }
     
     private void PlaySound(AudioClip clip)
@@ -424,14 +277,11 @@ public class MissileSystem : MonoBehaviour
     
     private void PlayLockingSound()
     {
-        // Play beeping sound that gets faster as lock progresses
-        lockingSoundTimer += Time.deltaTime;
-        float beepInterval = Mathf.Lerp(0.5f, 0.1f, GetLockProgress());
-        
-        if (lockingSoundTimer >= beepInterval)
+        if (lockingSound != null && !audioSource.isPlaying)
         {
-            lockingSoundTimer = 0f;
-            PlaySound(lockingSound);
+            audioSource.clip = lockingSound;
+            audioSource.loop = true;
+            audioSource.Play();
         }
     }
     
@@ -460,9 +310,19 @@ public class MissileSystem : MonoBehaviour
         return isLocked;
     }
     
+    public bool IsTargetLocking()
+    {
+        return isLocking;
+    }
+    
     public MissileType GetCurrentMissileType()
     {
         return currentMissileType;
+    }
+
+    public List<Transform> GetAvailableTargets()
+    {
+        return new List<Transform>(availableTargets);
     }
     
     public string GetTargetingInfo()

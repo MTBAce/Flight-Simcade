@@ -154,12 +154,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Missile
   missileType: 1
-  maxSpeed: 2000
-  acceleration: 50
+  maxSpeed: 2500
+  acceleration: 65
   turnRate: 3
-  maxLifetime: 120
+  maxLifetime: 300
   proximityDetonation: 5
-  fuelDuration: 30
+  fuelDuration: 45
   lockStrength: 1
   guidanceDelay: 0.5
   maxTurnAngle: 180

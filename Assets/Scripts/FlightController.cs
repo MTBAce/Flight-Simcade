@@ -48,6 +48,7 @@ public class FlightController : MonoBehaviour
 
     private void Awake()
     {
+        currentThrust = 100f;
         rb = GetComponent<Rigidbody>();
         missileSystem = GetComponent<MissileSystem>();
     }
