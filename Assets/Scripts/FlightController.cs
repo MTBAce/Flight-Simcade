@@ -27,6 +27,19 @@ public class FlightController : MonoBehaviour
     public float maxRudderAngle = 30f;
     public float maxFlapAngle = 40f;
     public float controlSurfaceSpeed = 5f;
+    
+    [Header("Engine Sound")]
+    [Tooltip("AudioSource component for engine sound (auto-found if not assigned)")]
+    public AudioSource engineSound;
+    
+    [Tooltip("Minimum pitch at idle throttle (0%)")]
+    public float minEnginePitch = 0.8f;
+    
+    [Tooltip("Maximum pitch at full throttle (100%)")]
+    public float maxEnginePitch = 2.0f;
+    
+    [Tooltip("How quickly the pitch changes")]
+    public float pitchChangeSpeed = 2f;
 
     private float throttle;
     private float currentThrust; // Actual engine thrust (lags behind throttle)
@@ -51,6 +64,16 @@ public class FlightController : MonoBehaviour
         currentThrust = 100f;
         rb = GetComponent<Rigidbody>();
         missileSystem = GetComponent<MissileSystem>();
+        
+        // Find engine sound AudioSource if not assigned
+        if (engineSound == null)
+        {
+            engineSound = GetComponent<AudioSource>();
+            if (engineSound == null)
+            {
+                Debug.LogWarning("[FlightController] No AudioSource found for engine sound. Please add one to enable engine sound pitch control.");
+            }
+        }
     }
 
     private void HandleInput()
@@ -69,6 +92,7 @@ public class FlightController : MonoBehaviour
         HandleInput();
         UpdateHUD();
         AnimateControlSurfaces();
+        UpdateEngineSoundPitch();
     }
 
     private void FixedUpdate()
@@ -156,6 +180,20 @@ public class FlightController : MonoBehaviour
             Quaternion targetRotation = Quaternion.Euler(targetAngle, 0, 0);
             rightFlap.localRotation = Quaternion.Lerp(rightFlap.localRotation, targetRotation, deltaTime);
         }
+    }
+
+    private void UpdateEngineSoundPitch()
+    {
+        if (engineSound == null)
+            return;
+        
+        // Calculate target pitch based on current thrust (0-100 scale)
+        // Use currentThrust instead of throttle for smoother, more realistic sound
+        float thrustPercent = currentThrust / 100f;
+        float targetPitch = Mathf.Lerp(minEnginePitch, maxEnginePitch, thrustPercent);
+        
+        // Smoothly interpolate to target pitch
+        engineSound.pitch = Mathf.Lerp(engineSound.pitch, targetPitch, Time.deltaTime * pitchChangeSpeed);
     }
 
     private void UpdateHUD()
