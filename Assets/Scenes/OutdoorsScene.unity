@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 109239986}
   - component: {fileID: 109239985}
   m_Layer: 0
-  m_Name: Particle System
+  m_Name: SmokeTrail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7946,9 +7946,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99a5ae53ec67ab6469843a470e4b083b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlightController
-  throttleIncrement: 0.1
-  maxThrust: 2600
-  responsiveness: 6
+  throttleIncrement: 0.6
+  maxThrust: 3000
+  responsiveness: 6.5
   lift: 40
   engineSpoolTime: 14
   dragCoefficient: 0.5
@@ -8043,9 +8043,9 @@ MonoBehaviour:
   availableTargetPrefab: {fileID: 3865020797602692962, guid: 64f1c2722a9a09f4486a9005520b3ffd, type: 3}
   lockingTargetPrefab: {fileID: 0}
   lockedTargetPrefab: {fileID: 4931607511055412726, guid: 14b72d5b8194f1e4499190dc9ccf2020, type: 3}
-  availableColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.7}
-  lockingColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  lockedColor: {r: 1, g: 0, b: 0, a: 1}
+  availableColor: {r: 0, g: 1, b: 0, a: 0.39215687}
+  lockingColor: {r: 0, g: 1, b: 0, a: 0.39215687}
+  lockedColor: {r: 0, g: 1, b: 0, a: 0.39215687}
   indicatorScale: 1
   enablePulseEffect: 1
   pulseSpeed: 10
