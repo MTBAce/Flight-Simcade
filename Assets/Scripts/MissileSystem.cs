@@ -15,7 +15,6 @@ public class MissileSystem : MonoBehaviour
     public float lockAngle = 30f; // degrees from nose
     public float lockBreakAngle = 45f; // Break lock if target moves outside this angle
     public LayerMask targetLayer;
-    public KeyCode cycleMissileKey = KeyCode.N;
     public KeyCode cycleTargetKey = KeyCode.T;
     public KeyCode fireMissileKey = KeyCode.F;
     
@@ -53,7 +52,6 @@ public class MissileSystem : MonoBehaviour
         UpdateTargeting();
         HandleMissileFiring();
         HandleTargetCycling();
-        HandleMissileTypeSelection();
     }
     
     private void UpdateTargeting()
@@ -178,21 +176,6 @@ public class MissileSystem : MonoBehaviour
             Debug.Log($"Cycling to target: {currentTarget.name}");
         }
     }
-    
-    private void HandleMissileTypeSelection()
-    {
-        if (Input.GetKeyDown(cycleMissileKey))
-        {
-            // Cycle between missile types
-            if (currentMissileType == MissileType.RadarGuided)
-                currentMissileType = MissileType.HeatSeeking;
-            else
-                currentMissileType = MissileType.RadarGuided;
-            
-            Debug.Log($"Missile type: {currentMissileType}");
-        }
-    }
-    
     private void HandleMissileFiring()
     {
         // Fire missile with a key (e.g., left mouse button or a specific key)
@@ -241,9 +224,6 @@ public class MissileSystem : MonoBehaviour
             Destroy(missileObj);
             return;
         }
-        
-        // Set missile type
-        missile.missileType = currentMissileType;
         
         // Get aircraft velocity for proper launch
         Vector3 aircraftVelocity = Vector3.zero;

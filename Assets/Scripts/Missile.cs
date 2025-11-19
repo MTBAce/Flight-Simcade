@@ -261,6 +261,5 @@ public class Missile : MonoBehaviour
 
 public enum MissileType
 {
-    HeatSeeking,
     RadarGuided
 }
