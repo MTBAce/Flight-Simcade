@@ -37,7 +37,8 @@ public class MissileSystem : MonoBehaviour
     private FlightController flightController;
     private float lockingSoundTimer;
     private MissileType currentMissileType;
-    
+
+
     private void Awake()
     {
         currentMissileCount = maxMissiles;
@@ -224,7 +225,9 @@ public class MissileSystem : MonoBehaviour
             Destroy(missileObj);
             return;
         }
-        
+
+        missile.owner = gameObject;
+
         // Get aircraft velocity for proper launch
         Vector3 aircraftVelocity = Vector3.zero;
         Rigidbody rb = GetComponent<Rigidbody>();

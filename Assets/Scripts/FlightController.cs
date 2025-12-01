@@ -240,4 +240,20 @@ public class FlightController : MonoBehaviour
             hud.text += "N: Change Missile Type\n";
         }
     }
+
+
+    public void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log("FlightController collided with " + collision.gameObject.name);
+        Missile missile = collision.gameObject.GetComponent<Missile>();
+        if (missile != null && missile.owner == this.gameObject)
+        {
+            // Ignore collision with own missile
+            return;
+        }
+
+        // Otherwise, destroy the plane
+        Destroy(this.gameObject);
+    }
+
 }

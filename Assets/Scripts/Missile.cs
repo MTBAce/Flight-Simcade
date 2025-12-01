@@ -1,3 +1,4 @@
+using System.Reflection;
 using UnityEngine;
 
 public class Missile : MonoBehaviour
@@ -38,6 +39,8 @@ public class Missile : MonoBehaviour
     private Vector3 lastTargetPosition;
     private bool targetLost = false;
 
+    public GameObject owner;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -56,6 +59,7 @@ public class Missile : MonoBehaviour
     
     public void Initialize(Transform launchPoint, Transform targetTransform, float lockQuality, Vector3 launchVelocity)
     {
+
         target = targetTransform;
         lockStrength = lockQuality;
         launchTime = Time.time;
