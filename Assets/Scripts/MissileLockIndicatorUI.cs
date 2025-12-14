@@ -2,10 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-/// <summary>
-/// Manages UI indicators for missile lock targets. Shows all available targets with visual feedback
-/// for their lock state (available, locking, or locked).
-/// </summary>
+
 public class MissileLockIndicatorUI : MonoBehaviour
 {
     #region Inspector Fields
@@ -91,9 +88,7 @@ public class MissileLockIndicatorUI : MonoBehaviour
     
     #region Nested Classes
     
-    /// <summary>
-    /// Stores all data and references for a single target indicator
-    /// </summary>
+  
     private class TargetIndicatorData
     {
         public GameObject gameObject;
@@ -104,9 +99,7 @@ public class MissileLockIndicatorUI : MonoBehaviour
         public CanvasGroup canvasGroup;
     }
     
-    /// <summary>
-    /// Represents the current state of a target
-    /// </summary>
+ 
     private enum TargetLockState
     {
         Available,  // Target detected but not being locked
@@ -141,9 +134,6 @@ public class MissileLockIndicatorUI : MonoBehaviour
     
     #region Initialization
     
-    /// <summary>
-    /// Finds and assigns required references if not set in inspector
-    /// </summary>
     private void InitializeReferences()
     {
         // Find missile system
@@ -183,9 +173,6 @@ public class MissileLockIndicatorUI : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Creates a container object to organize all indicators
-    /// </summary>
     private void CreateIndicatorContainer()
     {
         if (targetCanvas == null)
@@ -206,9 +193,6 @@ public class MissileLockIndicatorUI : MonoBehaviour
         indicatorContainer.SetAsLastSibling();
     }
     
-    /// <summary>
-    /// Validates that all required references are available
-    /// </summary>
     private bool ValidateReferences()
     {
         return missileSystem != null && mainCamera != null && targetCanvas != null && indicatorContainer != null;

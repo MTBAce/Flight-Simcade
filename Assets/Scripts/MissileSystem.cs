@@ -180,7 +180,7 @@ public class MissileSystem : MonoBehaviour
     private void HandleMissileFiring()
     {
         // Fire missile with a key (e.g., left mouse button or a specific key)
-        if (Input.GetKeyDown(KeyCode.Mouse0) || Input.GetKeyDown(KeyCode.F))
+        if ( Input.GetKeyDown(KeyCode.F))
         {
             if (currentMissileCount <= 0)
             {

@@ -179,9 +179,6 @@ public class AI_Spawner : MonoBehaviour
     
     // Public methods for external control
     
-    /// <summary>
-    /// Manually start the next wave
-    /// </summary>
     public void ForceNextWave()
     {
         if (!waveInProgress)
@@ -190,18 +187,12 @@ public class AI_Spawner : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Stop all wave spawning
-    /// </summary>
     public void StopWaves()
     {
         StopAllCoroutines();
         waveInProgress = false;
     }
     
-    /// <summary>
-    /// Destroy all active enemies
-    /// </summary>
     public void ClearAllEnemies()
     {
         foreach (GameObject enemy in activeEnemies)
@@ -215,9 +206,6 @@ public class AI_Spawner : MonoBehaviour
         enemiesAlive = 0;
     }
     
-    /// <summary>
-    /// Reset the spawner to initial state
-    /// </summary>
     public void ResetSpawner()
     {
         StopWaves();
